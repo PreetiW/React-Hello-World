@@ -7,8 +7,41 @@ class Todo extends React.Component {
     super()
     this.state = {
       currentTodo: '',
-      todos: []
+      todos: [],
+      audioUrl: ''
     }
+
+    
+
+  }
+
+  componentWillMount(){
+    console.log("Component will Mount")
+  
+
+    navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => { 
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.start();
+
+      const audioChunks = [];
+
+      mediaRecorder.addEventListener("dataavailable", event => {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.addEventListener("stop", () => {
+        const audioBlob = new Blob(audioChunks);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        this.playAudio(audioUrl);
+        let urls = [];
+        this.addToCache([audioUrl])
+      });
+
+      setTimeout(() => {
+        mediaRecorder.stop();
+      }, 10000);
+    });
   }
 
   addTodo = () => {
@@ -29,6 +62,15 @@ class Todo extends React.Component {
     })
   }
 
+  playAudio = (audioUrl) => {
+    if(audioUrl !== ''){
+      console.log("Audio URL:", audioUrl, typeof audioUrl);
+      const audio = new Audio(audioUrl);
+      audio.play();
+      this.setState({ audioUrl })
+    }
+  }
+
   handleTextInput = (e) => {
     const { target: { value } } = e
     this.setState({
@@ -37,6 +79,7 @@ class Todo extends React.Component {
   }
 
   render() {
+    console.log("Rendering");
     const { todos } = this.state
     return (
       <React.Fragment>
@@ -49,17 +92,48 @@ class Todo extends React.Component {
         </ul>
         <input type='text' onChange={this.handleTextInput} />
         <button onClick={this.addTodo}>Add</button>
+        <button onClick={() => {this.playAudio(this.state.audioUrl)}}>Play Audio</button>
         <img src={one} />
       </React.Fragment>
     )
   }
 
-  async componentDidMount () {
-      const response = await fetch('http://localhost:8000/todos')
+  async addToCache(urls) {
+    const myCache = await window.caches.open('my-cache');
+    await myCache.addAll(urls);
+  }
+
+  componentDidMount () {
+
+    /*window.indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || 
+    window.msIndexedDB;
+     
+    window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || 
+    window.msIDBTransaction;
+    window.IDBKeyRange = window.IDBKeyRange || 
+    window.webkitIDBKeyRange || window.msIDBKeyRange
+    console.log("Preeti is awesome!!");
+    if (!window.indexedDB) {
+       window.alert("Your browser doesn't support a stable version of IndexedDB.")
+    } else {
+      window.alert("Your browser doesn't support a stable version of IndexedDB.")
+      
+    }*/
+
+    console.log("Window Object:", window);
+
+    fetch('http://localhost:8000/todos')
+    .then(response => response.json())
+    .then(todos => this.setState({todos}))
+    .catch(function(error){
+      console.log("Errors", error)
+    })
+
+     /* const response = await fetch('http://localhost:8000/todos')
       const todos = await response.json()
       this.setState({
           todos
-      })
+      })*/
   }
 }
 

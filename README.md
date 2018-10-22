@@ -17,6 +17,13 @@ The features which has been used so far using workbox are as below:
 Please follow the below tutorial to understand more about the app and to create a json-server for storing todo data
 https://medium.freecodecamp.org/how-to-build-a-custom-pwa-with-workbox-in-create-react-app-be580686cf73
 
+
+##Storing Audio Offline
+
+* https://github.com/abudaan/heartbeat/wiki/Storing-audio-locally
+* https://developers.google.com/web/fundamentals/instant-and-offline/web-storage/indexeddb-best-practices
+* 
+
 * Additonal Resources:
   * [What is Webpack](https://www.youtube.com/watch?v=GU-2T7k9NfI&t=1s)
   * [Offline UX Considerations](https://developers.google.com/web/fundamentals/instant-and-offline/offline-ux#inform_the_user_when_the_app_is_ready_for_offline_consumption)
